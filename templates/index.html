@@ -59,7 +59,7 @@
 
     <div class="app-page" data-page="timer-page">
       <div class="app-topbar">
-        <!-- <div class="app-button left" data-back data-autotitle></div> -->
+        <div class="app-button left" data-back>Back</div>
         <div class="app-title">Get Ready</div>
       </div>
       <div class="app-content">
@@ -69,14 +69,21 @@
 
      <div class="app-page" data-page="graph-page">
       <div class="app-topbar">
+        <div class="app-button left" data-back>Back</div>
+
         <!-- <div class="app-button left" data-target="home" data-autotitle></div> -->
         <div class="app-title">Power Generated</div>
       </div>
       <div class="app-content">
         <div id="time-left"></div>
+        <div id="results-total"></div>
+        <div id='stopButton' class="app-button">Stop</div>
+
  
         <div id="chartContainer"></div>
- 
+      
+
+        </div>
       </div>
     </div>
 
@@ -118,7 +125,11 @@
       var runTime = 30;
       var bike = 'a';
 
-      
+      var seconds = 0;
+      var minutes = 0;
+      var calories = 0;
+      var timerRunning = false;
+
       function setBike(val){
   
       }
@@ -197,11 +208,16 @@
 
                   dps.push({x:time, y:power});
                   energy += power * dt;
+                  calories += msg.current * dt * 0.043; // magic number to convert energy generated into calories burned
                   //chart.options.title.text = 'Energy Generated - ' + Math.round(energy) + 'J';
                   chart.render(); 
                 // $('#log').html(msg); 
-                 console.log("Power:  " + power + " current: " + msg.current + " count: " + time + " dt:" + dt );
+                 //console.log("Power:  " + power + " current: " + msg.current + " count: " + time + " dt:" + dt );
                  counter++;
+                 $('#results-total').html("Energy:" + Math.round(energy) + " joules<br />" 
+                  + "Calories Burned: " + Math.round(calories)) ;
+     
+       
                 }             
 
             }           
@@ -243,8 +259,19 @@
 
       App.controller('graph-page', function (page) {
         var count = 0;
+        
           
         $(page).on('appShow', function () {
+
+        $(page)
+          .find('#stopButton')
+          .on('click', function () {
+            console.log('stopButton pressed');
+            timerRunning = false;
+            graphing = false;
+          });
+
+
           chart = new CanvasJS.Chart("chartContainer", {
           data: [
               {
@@ -271,12 +298,29 @@
             
           chart.render();
           graphing = true;
+          var millis = 0;
+          timerRunning = true;
           var interval = setInterval(function() {
-            count++;
-            $('#time-left').text('Time: '+ (lastTime - startGraphTime) );
-
-
-          }, 1000);
+    
+            if(timerRunning)
+               millis++;
+            
+            if(millis >= 10){
+              seconds++;
+              millis = 0;
+            }
+                if (seconds >= 60) {
+                    seconds = 0;
+                    minutes++;
+                    
+                }
+                
+            var timeString = (minutes ? (minutes > 9 ? minutes : "0" + minutes) : "00") 
+                + ":" + (seconds > 9 ? seconds : "0" + seconds)
+                + "." + millis;
+            $('#time-left').text('Time: '+ timeString );
+            
+          }, 100);
 
 
         });
