@@ -11,7 +11,7 @@
             text-align: center;
         }
             #time-left {
-            font-size: 30px;
+            font-size: 20px;
             
         }
           .welcome-text{
@@ -68,17 +68,16 @@
     </div>
 
      <div class="app-page" data-page="graph-page">
-      <div class="app-topbar">
+      <!--<div class="app-topbar">
         <div class="app-button left" data-back>Back</div>
 
-        <!-- <div class="app-button left" data-target="home" data-autotitle></div> -->
         <div class="app-title">Power Generated</div>
-      </div>
+      </div> -->
       <div class="app-content">
+
         <div id="time-left"></div>
         <div id="results-total"></div>
         <div id='stopButton' class="app-button">Stop</div>
-
  
         <div id="chartContainer"></div>
       
@@ -130,9 +129,21 @@
       var calories = 0;
       var timerRunning = false;
 
-      function setBike(val){
-  
+      function hideAddressBar()
+      {
+        if(!window.location.hash)
+        {
+            if(document.height < window.outerHeight)
+            {
+                document.body.style.height = (window.outerHeight + 50) + 'px';
+            }
+
+            setTimeout( function(){ window.scrollTo(0, 1); }, 50 );
+        }
       }
+
+      window.addEventListener("load", function(){ if(!window.pageYOffset){ hideAddressBar(); } } );
+      window.addEventListener("orientationchange", hideAddressBar );
 
       App.controller('home', function (page) {
 
@@ -214,7 +225,7 @@
                 // $('#log').html(msg); 
                  //console.log("Power:  " + power + " current: " + msg.current + " count: " + time + " dt:" + dt );
                  counter++;
-                 $('#results-total').html("Energy:" + Math.round(energy) + " joules<br />" 
+                 $('#results-total').html("Energy:" + Math.round(energy) + " joules   " 
                   + "Calories Burned: " + Math.round(calories)) ;
      
        
@@ -292,7 +303,7 @@
 
           style : {
           },
-            zoomEnabled: true
+            zoomEnabled: false
           });
           //dps = [{x:0, y:0}];
             
@@ -322,9 +333,9 @@
             
           }, 100);
 
+        window.scrollTo(0, 1);
 
         });
-
         
       });
       
