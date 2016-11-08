@@ -1,0 +1,7 @@
+echo "setting up shutdown"
+#sudo python /home/pi/shutdown.py&
+echo "setting IP address"
+#sudo ifconfig wlan0 192.168.100.114 netmask 255.255.255.0
+echo "running energy calc"
+python /home/pi/bicycle-calc/read_current.py &
+python /home/pi/bicycle-calc/server.py &

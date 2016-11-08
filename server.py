@@ -54,6 +54,12 @@ def index():
         thread = sio.start_background_task(background_thread)
     return render_template('index.html')
 
+@app.route('/shutdown')
+def shutdown():
+    import os
+    os.system('sudo shutdown -h now')
+
+    return "Shutting down"
 
 
 
