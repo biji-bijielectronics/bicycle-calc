@@ -257,15 +257,7 @@
           graphing = true;
           var interval = setInterval(function() {
             count++;
-            if (count >= runTime ){
-              graphing = false;
-              clearInterval(interval);
-              //alert()
-              App.load('results-page');
-             
-
-          }else
-            $('#time-left').text('Time remaining: '+ (runTime - count) + 's');
+            $('#time-left').text('Time: '+ (lastTime - startGraphTime) );
 
 
           }, 1000);
