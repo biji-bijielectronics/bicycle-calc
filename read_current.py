@@ -1,6 +1,7 @@
 import serial
 import time
 import redis
+import sys
 
 ser1 = serial.Serial()
 

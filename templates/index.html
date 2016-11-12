@@ -33,13 +33,29 @@
       </div>
      <div class="app-content">
         <div class="app-section">
-          <div class="welcome-text">Welcome to the Bicycle Blender Challenge</div>
+          <div class="welcome-text">Please Select Bike:</div>
           <div id='bikeA' class="app-button">Bike A</div>
         
           <div id='bikeB' class="app-button">Bike B</div>
         </div>
       </div>
     </div>
+
+    <div class="app-page" data-page="start-page">
+      <div class="app-topbar">
+        <div class="app-button left" data-back>Back</div>
+        <div class="app-title">Start Page</div>
+     
+     </div>
+     <div class="app-content">
+        <div class="app-section">
+          
+        <div class="app-button" data-target="timer-page">Start</div> 
+        </div>
+      </div>
+    </div>
+
+
 
     <div class="app-page" data-page="timer-page">
       <div class="app-topbar">
@@ -114,7 +130,7 @@
           .on('click', function () {
             console.log('bikeA was clicked!');
             bike = 'a';
-            App.load('graph-page');  
+            App.load('start-page');  
 
           });
 
@@ -123,7 +139,7 @@
           .on('click', function () {
             console.log('bikeB was clicked!');
             bike = 'b';
-            App.load('graph-page');  
+            App.load('start-page');  
 
           });
 
