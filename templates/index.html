@@ -97,12 +97,13 @@
           <div id="results-total"></div>
           <div class="results-text">
           That's equivalent to:
+            <div id="results-calories"></div>
             <div id="results-phone"></div>
             <div id="results-laptop"></div>
           </div>
 
         </div>
-        <div class="app-button" data-target="home">Return to Start</div>
+        <div class="app-button" data-target="start-page">Return to Start</div>
       </div>
     </div>
 
@@ -225,9 +226,7 @@
                 // $('#log').html(msg); 
                  //console.log("Power:  " + power + " current: " + msg.current + " count: " + time + " dt:" + dt );
                  counter++;
-                 $('#results-total').html("Energy:" + Math.round(energy) + " joules   " 
-                  + "Calories Burned: " + Math.round(calories)) ;
-     
+               
        
                 }             
 
@@ -280,6 +279,7 @@
             console.log('stopButton pressed');
             timerRunning = false;
             graphing = false;
+            App.load('results-page');
           });
 
 
@@ -342,8 +342,10 @@
       App.controller('results-page', function (page) {
           $(page).on('appShow', function () {
             $('#results-total').html("Well Done! <br/>You generated " + Math.round(energy) + " joules") ;
+            $('#results-calories').html("Burning " + Math.round(calories) + " calories") ;
             $('#results-phone').html("Charging your phone for " + Math.round(energy / 5 / 60,1) + " min") ;
             $('#results-laptop').html("Powering your laptop for " + Math.round(energy / 65 / 60 ) + " min") ;
+
             energy = 0.0;
           }); 
         });  
