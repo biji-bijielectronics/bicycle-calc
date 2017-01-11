@@ -122,13 +122,15 @@
       var atHome = false;
       var startGraphTime = 0;
       var lastTime = 0;
-      var runTime = 30;
+      var runTime = 0;
       var bike = 'a';
 
       var seconds = 0;
       var minutes = 0;
       var calories = 0;
       var timerRunning = false;
+      var millis = 0;
+          
 
       function hideAddressBar()
       {
@@ -217,8 +219,23 @@
                   var dt = msg.time - lastTime;
                   //alert(msg);
                   lastTime = msg.time
-
                   dps.push({x:time, y:power});
+                  
+                  var timeString = ""; 
+                  
+                  var hours   = Math.floor(time / 3600);
+                  var minutes = Math.floor((time - (hours * 3600)) / 60);
+                  var seconds = Math.floor(time) - (hours * 3600) - (minutes * 60);
+                  var mills = Math.round((time - (hours * 3600) - (minutes * 60) - seconds) * 10 );
+
+                  if (hours   < 10) {hours   = "0"+hours;}
+                  if (minutes < 10) {minutes = "0"+minutes;}
+                  if (seconds < 10) {seconds = "0"+seconds;}
+
+                  //timeString = hours+':'+minutes+':'+seconds + '.' +  mills;  
+                  timeString = minutes+':'+seconds + '.' +  mills;  
+  
+                  $('#time-left').text('Time: '+ timeString);  
                   energy += power * dt;
                   calories += msg.current * dt * 0.043; // magic number to convert energy generated into calories burned
                   //chart.options.title.text = 'Energy Generated - ' + Math.round(energy) + 'J';
@@ -279,6 +296,7 @@
             console.log('stopButton pressed');
             timerRunning = false;
             graphing = false;
+            millis = 0;
             App.load('results-page');
           });
 
@@ -309,14 +327,20 @@
             
           chart.render();
           graphing = true;
-          var millis = 0;
+          millis = 0;
           timerRunning = true;
-          var interval = setInterval(function() {
+/*          var interval = setInterval(function() {
     
-            if(timerRunning)
+            if(timerRunning){
                millis++;
-            
-            if(millis >= 10){
+             }
+            else{
+              millis = 0; 
+              seconds = 0;
+              minutes = 0;  
+            }
+              
+            if(millis >= 100){
               seconds++;
               millis = 0;
             }
@@ -331,7 +355,7 @@
                 + "." + millis;
             $('#time-left').text('Time: '+ timeString );
             
-          }, 100);
+          }, 10);*/
 
         window.scrollTo(0, 1);
 
