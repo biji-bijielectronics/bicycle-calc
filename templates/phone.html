@@ -1,0 +1,366 @@
+<!DOCTYPE html>
+<html>
+  <head>
+    <title>Energy Calculator</title>
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no, minimal-ui">
+    <link rel="stylesheet" href="static/css/app.min.css">
+    <style>
+            #timer {
+            color : red;
+            font-size: 100px;
+            text-align: center;
+        }
+            #time-left {
+            font-size: 20px;
+            
+        }
+          .welcome-text{
+
+            text-align: center;
+          }
+
+          .results-text{
+            font-size: 14px;
+          }
+
+    </style>
+  </head>
+
+  <body>
+    <div class="app-page" data-page="home">
+      <div class="app-topbar">
+        <div class="app-title">Bicycle Blender Challenge</div>
+      </div>
+     <div class="app-content">
+        <div class="app-section">
+          <div class="welcome-text">Please Select Bike:</div>
+          <div id='bikeA' class="app-button">Bike A</div>
+        
+          <div id='bikeB' class="app-button">Bike B</div>
+        </div>
+      </div>
+    </div>
+
+    <div class="app-page" data-page="start-page">
+      <div class="app-topbar">
+        <div class="app-button left" data-back>Back</div>
+        <div class="app-title">Start Page</div>
+     
+     </div>
+     <div class="app-content">
+        <div class="app-section">
+          
+        <div class="app-button" data-target="timer-page">Start</div> 
+        </div>
+      </div>
+    </div>
+
+
+
+    <div class="app-page" data-page="timer-page">
+      <div class="app-topbar">
+        <div class="app-button left" data-back>Back</div>
+        <div class="app-title">Get Ready</div>
+      </div>
+      <div class="app-content">
+       <div id="timer">5</div>
+      </div>
+    </div>
+
+     <div class="app-page" data-page="graph-page">
+      <!--<div class="app-topbar">
+        <div class="app-button left" data-back>Back</div>
+
+        <div class="app-title">Power Generated</div>
+      </div> -->
+      <div class="app-content">
+
+        <div id="time-left"></div>
+        <div id="results-total"></div>
+        <div id='stopButton' class="app-button">Stop</div>
+ 
+        <div id="chartContainer"></div>
+      
+
+        </div>
+      </div>
+    </div>
+
+
+    <div class="app-page" data-page="results-page">
+      <div class="app-topbar">
+        <!-- <div class="app-button left" data-back data-autotitle></div> -->
+        <div class="app-title">Results</div>
+      </div>
+      <div class="app-content">
+        <div id="results">
+          <div id="results-total"></div>
+          <div class="results-text">
+          That's equivalent to:
+            <div id="results-phone"></div>
+            <div id="results-laptop"></div>
+          </div>
+
+        </div>
+        <div class="app-button" data-target="home">Return to Start</div>
+      </div>
+    </div>
+
+
+    <script src="static/js/zepto.js"></script>
+    <script src="static/js/app.min.js"></script>
+    <script src="static/js/socket.io.min.js"></script>
+    <script src="static/js/canvasjs.min.js"></script>
+
+    <script>
+      var dps = [{x:0, y:0}];
+      var graphing = false;
+      var chart;
+      var counter;
+      var energy = 0.0;
+      var atHome = false;
+      var startGraphTime = 0;
+      var lastTime = 0;
+      var runTime = 30;
+      var bike = 'a';
+
+      var seconds = 0;
+      var minutes = 0;
+      var calories = 0;
+      var timerRunning = false;
+
+      function hideAddressBar()
+      {
+        if(!window.location.hash)
+        {
+            if(document.height < window.outerHeight)
+            {
+                document.body.style.height = (window.outerHeight + 50) + 'px';
+            }
+
+            setTimeout( function(){ window.scrollTo(0, 1); }, 50 );
+        }
+      }
+
+      window.addEventListener("load", function(){ if(!window.pageYOffset){ hideAddressBar(); } } );
+      window.addEventListener("orientationchange", hideAddressBar );
+
+      App.controller('home', function (page) {
+
+         $(page)
+          .find('#bikeA')
+          .on('click', function () {
+            console.log('bikeA was clicked!');
+            bike = 'a';
+            App.load('start-page');  
+
+          });
+
+         $(page)
+          .find('#bikeB')
+          .on('click', function () {
+            console.log('bikeB was clicked!');
+            bike = 'b';
+            App.load('start-page');  
+
+          });
+
+        atHome = true;
+        //connect to the socket server.
+        //var socket = io.connect('http://' + document.domain + ':' + location.port + '/test');
+        var socket = io.connect('http://' + document.domain + ':8080/adc');
+        
+        startGraphTime = 0;
+        energy = 0.0;    
+               
+        counter = 0;
+
+        socket.on('button', function(msg) {
+          if(atHome){
+            dps = [{x:0, y:0}];
+            graphing = false;
+            energy = 0.0;
+            startGraphTime = 0;
+            atHome = false;
+          //  App.load('graph-page');
+            App.load('timer-page');  
+  
+          }
+          
+        });
+
+        //receive details from server
+        socket.on('newData', function(msg) {
+            //console.log("Received number " + msg.current + " " + msg.voltage );
+            //maintain a list of ten numbers
+            //if (numbers_received.length >= 10){
+            //    numbers_received.shift()
+            //}
+           // var msg = JSON.parse(data);
+            //console.log(msg);
+                 
+            if(graphing){
+                if(startGraphTime == 0){
+                  startGraphTime = msg.time;
+                  lastTime = msg.time;
+                }
+
+                // Only show values > 150mA
+                if(msg.current < 0.15){
+                   msg.current = 0.0; 
+                }
+                $('#log').html(msg);
+                if(msg.bike == bike){
+                  var power = msg.current * msg.voltage;
+                  var time = msg.time - startGraphTime
+                  var dt = msg.time - lastTime;
+                  //alert(msg);
+                  lastTime = msg.time
+
+                  dps.push({x:time, y:power});
+                  energy += power * dt;
+                  calories += msg.current * dt * 0.043; // magic number to convert energy generated into calories burned
+                  //chart.options.title.text = 'Energy Generated - ' + Math.round(energy) + 'J';
+                  chart.render(); 
+                // $('#log').html(msg); 
+                 //console.log("Power:  " + power + " current: " + msg.current + " count: " + time + " dt:" + dt );
+                 counter++;
+                 $('#results-total').html("Energy:" + Math.round(energy) + " joules   " 
+                  + "Calories Burned: " + Math.round(calories)) ;
+     
+       
+                }             
+
+            }           
+                       //   $('#log').html(msg);
+      
+        });
+
+
+      });
+
+      App.controller('timer-page', function (page) {
+
+        dps = [{x:0, y:0}];
+        graphing = false;
+
+        startGraphTime = 0;
+
+        var counter = 5;
+        graphing = false;
+        var interval = setInterval(function() {
+          counter--;
+
+          // Display 'counter' wherever you want to display it.
+          if (counter == 0) {
+              // Display a login box
+              clearInterval(interval);
+              $('#timer').text('Go!');
+              App.load('graph-page');
+              //loadChart();
+          
+          }
+          else{
+               $('#timer').text(counter);
+          }
+        }, 1000);
+        
+      });
+
+
+      App.controller('graph-page', function (page) {
+        var count = 0;
+        
+          
+        $(page).on('appShow', function () {
+
+        $(page)
+          .find('#stopButton')
+          .on('click', function () {
+            console.log('stopButton pressed');
+            timerRunning = false;
+            graphing = false;
+          });
+
+
+          chart = new CanvasJS.Chart("chartContainer", {
+          data: [
+              {
+                type: "line",
+                dataPoints: dps
+              }
+          ],
+          title: {
+           //   text: "Power Generated"
+          },
+          axisX:{ 
+              title: "Time (s)",
+          },
+
+          axisY:{ 
+              title: "Power (W)",
+          },
+
+          style : {
+          },
+            zoomEnabled: false
+          });
+          //dps = [{x:0, y:0}];
+            
+          chart.render();
+          graphing = true;
+          var millis = 0;
+          timerRunning = true;
+          var interval = setInterval(function() {
+    
+            if(timerRunning)
+               millis++;
+            
+            if(millis >= 10){
+              seconds++;
+              millis = 0;
+            }
+                if (seconds >= 60) {
+                    seconds = 0;
+                    minutes++;
+                    
+                }
+                
+            var timeString = (minutes ? (minutes > 9 ? minutes : "0" + minutes) : "00") 
+                + ":" + (seconds > 9 ? seconds : "0" + seconds)
+                + "." + millis;
+            $('#time-left').text('Time: '+ timeString );
+            
+          }, 100);
+
+        window.scrollTo(0, 1);
+
+        });
+        
+      });
+      
+      App.controller('results-page', function (page) {
+          $(page).on('appShow', function () {
+            $('#results-total').html("Well Done! <br/>You generated " + Math.round(energy) + " joules") ;
+            $('#results-phone').html("Charging your phone for " + Math.round(energy / 5 / 60,1) + " min") ;
+            $('#results-laptop').html("Powering your laptop for " + Math.round(energy / 65 / 60 ) + " min") ;
+            energy = 0.0;
+          }); 
+        });  
+
+/*
+      try {
+        App.restore();
+      } catch (err) {
+        App.load('home');
+      }
+*/
+          App.load('home');
+    
+
+    </script>
+  </body>
+  <footer>
+    <div id="time-left"></div>
+  </footer>
+</html>

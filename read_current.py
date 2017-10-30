@@ -53,10 +53,10 @@ def read_serial(serial):
 		if current == 0:
 			voltage = 0
 		else:
-			voltage = 12.4
+			voltage = current
 		if time.time() - serial.last_read >= delay and running:
 			msg =  {'bike': bike, 'current': round(current,2), 'voltage': voltage , 'time': time.time() }
-			#print msg
+			print msg
 			r.publish('adc', msg)
 			serial.last_read = time.time()
 		

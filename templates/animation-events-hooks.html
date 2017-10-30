@@ -1,0 +1,133 @@
+﻿<!doctype html>
+<html>
+	
+  <head>
+    <meta charset="utf-8">
+    <title>Stopwatch</title>
+    <link rel="stylesheet" href="stopwatch.css">
+	
+	<meta charset="utf-8" />
+    <title>Animation events hooks</title>
+    <meta name="viewport" content="width=device-width">
+    <style>
+	h1 {
+    font-size: 150%;
+}
+    .wrapper {
+      position: relative;
+      width: 500px;
+      height: 150px;
+      margin: 50px auto 0 auto;
+      padding-bottom: 30px;
+      clear: both;
+    }
+	
+	.stopwatch {
+      position: relative;
+      width: 150px;
+      height: 240px;
+      margin: 50px auto 0 auto;
+      padding-bottom: 50px;
+      clear: both;
+    }
+	
+	.controls {
+      float: left;
+      width: 100%;
+      height: 10%;
+      box-sizing: border-box;
+    }
+	
+	
+
+    .box {
+      float: left;
+      width: 100%;
+      height: 100%;
+      box-sizing: border-box;
+    }
+
+    .container {
+      width: 320px;
+      margin: 0 auto;
+      text-align: center;
+    }
+
+    .gauge {
+      width: 320;
+      height: 240px;
+    }
+
+
+
+    p {
+      padding: 10px;
+      font-family: 'Arial';
+    }
+
+    #log {
+      color: #ccc;
+    }
+    </style>
+  </head>
+
+  <body>
+    <div class="wrapper">
+      <div class="box">
+        <div id="g1" class="gauge"></div>
+      </div>
+    </div>
+	
+	  <div class="stopwatch">
+        <div class="controls">
+            <button class="start">Start</button>
+            <button class="stop">Stop</button>
+            <button class="reset">Reset</button>
+        </div>
+		<div class="display">
+			<h1>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<span class="minutes">00</span>&nbsp;<span class="seconds">00</span>&nbsp;<span class="centiseconds">00</span>
+			</h1>
+		</div>
+       </div>
+
+        <script src="stopwatch.js"></script>
+
+    <script src="../raphael-2.1.4.min.js"></script>
+    <script src="../justgage.js"></script>
+	
+    <script>
+    document.addEventListener("DOMContentLoaded", function(event) {
+
+      var g1 = new JustGage({
+        id: 'g1',
+        value: 1845,
+        min: 0,
+        max: 3000,
+        symbol: 'J',
+        pointer: true,
+        pointerOptions: {
+          toplength: -15,
+          bottomlength: 10,
+          bottomwidth: 12,
+          color: '#8e8e93',
+          stroke: '#ffffff',
+          stroke_width: 3,
+          stroke_linecap: 'round'
+        },
+        gaugeWidthScale: 0.6,
+        counter: true,
+        onAnimationEnd: function() {
+          console.log('animation ended');
+          var log = document.getElementById('log');
+          log.innerHTML = log.innerHTML + 'Animation just ended.<br/>';
+        }
+      });
+
+    });
+    </script>
+	
+	
+	
+  </body>
+
+</html>

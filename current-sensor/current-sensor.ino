@@ -30,10 +30,10 @@ void setup()
 void loop()
 {
   total = total - readings[index];
-  readings[index] = analogRead(0); //Raw data reading
+  readings[index] = analogRead(A3); //Raw data reading
   //Data processing:510-raw data from analogRead when the input is 0;
   // 5-5v; the first 0.04-0.04V/A(sensitivity); the second 0.04-offset val;
-  readings[index] = (readings[index] - 512) * 5 / 1024 / 0.04 - 0.04;
+  readings[index] = (readings[index] - 514 ) * 5 / 1024 / 0.04 - 0.04;
 
   total = total + readings[index];
   index = index + 1;
